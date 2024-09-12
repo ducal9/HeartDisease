@@ -1,0 +1,141 @@
+
+
+  
+  .header {
+    height: 10%;
+    background: #0b0121;
+    padding: 24px;
+  }
+  
+  .navbar-container {
+    display: flex;
+    justify-content: center;
+  }
+  
+  .navbar-content {
+    display: flex;
+    justify-content: space-between;
+    width: 1200px;
+  }
+  
+  .navbar-brand {
+    width: 163px;
+    height: 78px;
+  }
+  
+  .navbar-menu {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+  }
+  
+  .navbar-link {
+    color: #ECECEC;
+    padding: 24px 12px;
+    text-decoration: none;
+  }
+  
+  .navbar-button {
+    padding: 8px 20px;
+    border-radius: 50px;
+    border: 1px solid #ECECEC;
+    background: none;
+    color: #ECECEC;
+    cursor: pointer;
+  }
+  
+  .body {
+    
+    height: 80%;
+    padding: 63px 10px 10px;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .playlist {
+    width: 1328px;
+  }
+  
+  .playlist-title {
+    font-family: 'Racing Sans One';
+    font-size: 48px;
+    text-align: center;
+    color: #ecf1f0;
+  }
+  
+  .playlist-video {
+    display: flex;
+    justify-content: center;
+    margin-top: 27px;
+    margin-bottom: 27px;
+  }
+  
+  .playlist-item {
+    position: relative;
+  }
+  
+  .playlist-image {
+    width: 718px;
+    border-radius: 20px;
+  }
+  
+  .playlist-description {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 20px;
+    font-weight: 700;
+    color: #FFFFFF;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 10px;
+    border-radius: 10px;
+  }
+  
+  .footer {
+    height: 10%;
+    border-top: 1px solid #ECECEC;
+    padding: 19px 20px 64px;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .footer-container {
+    width: 1200px;
+  }
+  
+  .footer-columns {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .footer-column {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin: 10px 50px 10px 50px;
+  }
+  
+  .footer-title {
+    font-size: 24px;
+    font-weight: 500;
+    color: #FFFFFF;
+  }
+  
+  .footer-column p {
+    font-size: 12px;
+    font-weight: 300;
+    color: #FFFFFF;
+  }
+  
+  .footer-disclaimer {
+    font-size: 23px;
+    font-weight: 300;
+    color: #b3b1ea;
+  }
+  
+  .footer-icon {
+    width: 242px;
+    height: 229px;
+  }
+  

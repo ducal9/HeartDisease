@@ -1,0 +1,39 @@
+.navbar-link {
+    position: relative;
+    display: inline-block;
+    text-decoration: none;
+    color: #000; /* Màu chữ của liên kết */
+  }
+  
+  .heart-container {
+    position: relative;
+  }
+  
+  .heart-effect {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 50px;
+    height: 50px;
+    background: url('../assets/navbar-brand.svg') ;
+    background-size: cover;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    pointer-events: none;
+  }
+  
+  .heart-effect.animate {
+    animation: fall 2s forwards;
+  }
+  
+  @keyframes fall {
+    0% {
+      opacity: 1;
+      transform: translate(-50%, -50%) translateY(0);
+    }
+    100% {
+      opacity: 0;
+      transform: translate(-50%, -50%) translateY(300px); /* Thay đổi giá trị này để điều chỉnh khoảng cách rơi */
+    }
+  }
+  
