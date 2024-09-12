@@ -15,12 +15,25 @@ collection = db.Heart_Disease_Data
 def import_mongodb():
     try:
         data = request.get_json()
-        result = collection.insert_many(data)
-        res = len(result.inserted_ids)
-        return jsonify({"message": "Success", "records_inserted": res})
+        existing_data = []
+
+        for item in data:
+            query = {key: item[key] for key in item.keys() if key != '_id'}
+            if collection.find_one(query):
+                existing_data.append(item)
+        
+        data_to_insert = [item for item in data if item not in existing_data]
+        
+        if data_to_insert:
+            result = collection.insert_many(data_to_insert)
+            res = len(result.inserted_ids)
+        else:
+            res = 0
+
+        return jsonify({"message": "Success", "documents_insert": res, "documents_existing": len(existing_data)})
     except Exception as e:
         return jsonify({"message": "Đã xảy ra lỗi", "error": str(e)})
-
+    
 @app.route('/pre-processing', methods=['POST'])
 def pre_processing():
     try:
@@ -96,6 +109,6 @@ def index():
     return "This is Temp-Import-DB Service"
 
 if __name__ == '__main__':
-    app.run(host='127.0.0.1', port=8033)
+    app.run(host='127.0.0.1', port=8033, debug=True)
 
 
