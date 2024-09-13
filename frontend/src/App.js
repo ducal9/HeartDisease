@@ -17,12 +17,14 @@ import Main from './components/Main';
 import MainHeart from './components/MainHeart';
 
 
+
 const App = () => {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Main />} />
         <Route path="/heart-disease-prediction" element={<MainHeart />} />
+      
       </Routes>
     </Router>
   );
