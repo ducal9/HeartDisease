@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, jsonify
 import pymongo
 from config import Config
 
@@ -9,15 +9,13 @@ db = client.PRE
 collection = db.Heart_Disease_Data
 
 
-@app.route('/count-document')
-def count_document():
-    collection_count = len(db.list_collection_names())
-    return str("Số lượng "+str(collection_count))
-
+@app.route('/select-model')
+def select_model():
+    return "Model"
 
 @app.route('/')
 def index():
-    return render_template('upload.html')
+    return "This is Prediction Service"
 
 
 if __name__ == '__main__':
