@@ -1,8 +1,68 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, Response
 import pandas as pd
 import requests
 from config import Config
+import imaplib
+import email
+from email.header import decode_header
+
+
 app = Flask(__name__)
+
+# Thông tin tài khoản Gmail của bạn
+username = "hdp24092000@gmail.com"
+password = "ccag kfnl taro kjiv"
+
+
+def connect_to_imap(username, password):
+    try:
+        # Kết nối đến máy chủ IMAP
+        mail = imaplib.IMAP4_SSL("imap.gmail.com")
+        # Đăng nhập
+        mail.login(username, password)
+        print("Login successful!")
+
+        # Chọn thư mục INBOX
+        mail.select("INBOX")
+        print("Selected INBOX successfully!")
+
+        return mail
+    except imaplib.IMAP4.error as e:
+        print(f"IMAP error: {e}")
+        return None
+
+
+def fetch_emails(mail):
+    # Tìm tất cả email trong thư mục INBOX
+    status, messages = mail.search(None, "ALL")
+
+    # Chia nhỏ danh sách ID email
+    email_ids = messages[0].split()
+
+    for email_id in email_ids:
+        # Lấy email theo ID
+        res, msg = mail.fetch(email_id, "(RFC822)")
+        msg = msg[0][1]
+
+        # Phân tích cú pháp email
+        msg = email.message_from_bytes(msg)
+
+        # Lấy tiêu đề email
+        subject, encoding = decode_header(msg["Subject"])[0]
+        if isinstance(subject, bytes):
+            subject = subject.decode(encoding if encoding else 'utf-8')
+
+        print(f"Email ID: {email_id.decode()}, Subject: {subject}")
+
+
+@app.route('/get-email')
+def get_email():
+    mail = connect_to_imap(username, password)
+    if mail:
+        fetch_emails(mail)
+        # Đóng kết nối
+        mail.logout()
+    return "Success", 200
 
 
 @app.route('/import-db', methods=['POST'])
