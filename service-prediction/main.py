@@ -1,5 +1,4 @@
-from flask import Flask, jsonify
-import pymongo
+from flask import Flask,request, jsonify
 from config import Config
 import pandas as pd
 import numpy as np
@@ -22,16 +21,13 @@ from sklearn.ensemble import AdaBoostClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neural_network import MLPClassifier
 import joblib
+import os
+
 
 app = Flask(__name__)
-client = pymongo.MongoClient(Config.MONGO_URL)
-db = client.PRE
-collection_hdd = db.Heart_Disease_Data
-collection_training = db.Training
 
 
 @app.route('/select-model')
-
 def select_model():
     df = pd.read_csv("E:/Fork/heartdiseaseproject/service-prediction/heart_new.csv")
     
@@ -73,7 +69,7 @@ def select_model():
     for name, model in models.items():
         model.fit(X_train, y_train)
         y_pred = model.predict(X_test)
-        
+
         accuracy = accuracy_score(y_test, y_pred)
         precision = precision_score(y_test, y_pred)
         recall = recall_score(y_test, y_pred)
@@ -98,10 +94,22 @@ def select_model():
             best_model_name = name
             best_model = model
 
+    # Xóa thư mục 'training' nếu tồn tại và tạo lại
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    training_dir = os.path.join(current_dir, 'training')
+
+    if os.path.exists(training_dir):
+        import shutil
+        shutil.rmtree(training_dir)  # Xóa thư mục
+    os.makedirs(training_dir)  # Tạo thư mục mới
+
     # Lưu mô hình vào file
-    model_file = f"{best_model_name.replace(' ', '_')}.joblib"
+    model_file = f"{training_dir}/training.joblib"
     joblib.dump(best_model, model_file)
 
+    # Lưu dữ liệu huấn luyện
+    training_data_file = f"{training_dir}/training_data.pkl"
+    joblib.dump((X_train, y_train), training_data_file)
 
     model_info = {
         'model_name': best_model_name,
@@ -111,86 +119,43 @@ def select_model():
         'num_test': int(num_test),
         'total_data': int(total_data)
     }
-    
-    #collection_training.insert_one(model_info)
 
     print(f"Best model: {best_model_name} saved as {model_file}")
-
-    # Xuất kết quả ra file JSON
-    report_file = "model_report.json"
-    with open(report_file, 'w') as f:
-        json.dump(results, f, indent=4)
 
     # Trả kết quả dưới dạng JSON
     return jsonify(results)
 
 
-@app.route('/model-lr')
-def model_logistic_regression():
-    data = pd.read_csv("E:\Fork\heartdiseaseproject\service-prediction\heart.csv")
 
-    # In thông tin dữ liệu và kiểm tra giá trị null
-    print(data.info())
-    print(data.isnull().sum())
+@app.route('/predict', methods=['POST'])
+def predict():
+    # Nhận dữ liệu từ yêu cầu POST
+    input_data = request.get_json()
 
-    y = data["target"]
-    X = data.drop('target', axis=1)
+    # Lấy thư mục chứa file Python hiện tại
+    current_dir = os.path.dirname(os.path.abspath(__file__))
 
-    # Chia dữ liệu thành tập huấn luyện và tập kiểm tra
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=0)
+    # Đường dẫn đến mô hình đã lưu
+    model_file = os.path.join(current_dir, 'training', 'training.joblib')  # Thay đổi phù hợp nếu cần
+    model = joblib.load(model_file)
 
-    # Chuẩn hóa dữ liệu
-    scale = StandardScaler()
-    X_train = scale.fit_transform(X_train)
-    X_test = scale.transform(X_test)
+    # Đường dẫn đến dữ liệu huấn luyện đã lưu
+    training_data_file = os.path.join(current_dir, 'training', 'training_data.pkl')
+    X_train, y_train = joblib.load(training_data_file)
 
-    # Huấn luyện mô hình Logistic Regression
-    model = LogisticRegression()
-    model.fit(X_train, y_train)
+    # Chuyển đổi dữ liệu đầu vào thành DataFrame
+    input_df = pd.DataFrame([input_data])  # Đảm bảo đầu vào là một DataFrame
 
-    # Dự đoán trên tập kiểm tra
-    y_predict = model.predict(X_test)
+    # Tiền xử lý dữ liệu tương tự như khi huấn luyện
+    imputer = SimpleImputer(strategy='mean')
+    input_df = imputer.fit_transform(input_df)
 
-    # Tính các chỉ số đánh giá
-    accuracy = accuracy_score(y_test, y_predict)
-    precision = precision_score(y_test, y_predict)
-    recall = recall_score(y_test, y_predict)
+    scaler = StandardScaler()
+    input_df = scaler.fit_transform(input_df)
 
-    # Tổng số mẫu
-    total_samples = len(y_test)
-
-    # Tổng số dự đoán chính xác
-    correct_predictions = (y_test == y_predict).sum()
-
-    # Tổng số dự đoán sai
-    incorrect_predictions = (y_test != y_predict).sum()
-
-    # Tạo DataFrame chỉ chứa số thứ tự, nhãn ban đầu và nhãn dự đoán
-    results = pd.DataFrame({
-        'Index': range(len(y_test)),
-        'Actual': y_test.values,
-        'Predicted': y_predict
-    })
-
-    # Chuyển đổi các giá trị thành kiểu dữ liệu Python cơ bản
-    results['Actual'] = results['Actual'].astype(int)
-    results['Predicted'] = results['Predicted'].astype(int)
-
-    # Chuẩn bị kết quả để trả về
-    output = {
-        'metrics': {
-            'Accuracy': float(accuracy),
-            'Precision': float(precision),
-            'Recall': float(recall),
-            'Total Samples': total_samples,
-            'Correct Predictions': int(correct_predictions),
-            'Incorrect Predictions': int(incorrect_predictions)
-        },
-        'results': results.to_dict(orient="records")
-    }
-
-    # Trả về kết quả JSON với format đẹp
-    return json.dumps(output, indent=4), 200, {'Content-Type': 'application/json'}
+    # Dự đoán
+    predictions = model.predict(input_df)
+    return jsonify({'prediction': predictions[0].item()})  # Nếu predictions[0] là một int64
 
 
 @app.route('/')
