@@ -38,6 +38,7 @@ def export_db():
 
 @app.route('/get-file-from-email')
 def get_file_from_email():
+    return "OK"
     #Service mail trong config
 
 
