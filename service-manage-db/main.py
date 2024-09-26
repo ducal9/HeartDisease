@@ -36,6 +36,11 @@ def export_db():
     return "Đã xuất file thành công"
 
 
+@app.route('/get-file-from-email')
+def get_file_from_email():
+    #Service mail trong config
+
+
 @app.route('/')
 def index():
     return "This is Import-DB Service"
