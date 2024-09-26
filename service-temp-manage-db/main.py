@@ -7,18 +7,26 @@ import email
 from email.header import decode_header
 import os
 import shutil
-
+from config import Config
 
 app = Flask(__name__)
 
-username = "hdp24092000@gmail.com"
-password = "ccag kfnl taro kjiv"
+
+@app.route('/send-file')
+def send_attachment():
+    download_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "download")
+    files = os.listdir(download_folder)
+
+    if not files:
+        return jsonify({"message": "No files to send."}), 404
+    
+    return jsonify({"message": "Files sent successfully."})
 
 
 @app.route('/get-email')
 def get_email():
     mail = imaplib.IMAP4_SSL("imap.gmail.com")
-    mail.login(username, password)
+    mail.login(Config.EMAIL, Config.PASSWORD)
     mail.select("inbox")
     
     status, messages = mail.search(None, 'UNSEEN')
@@ -52,10 +60,8 @@ def get_email():
                                         f.write(part.get_payload(decode=True))
         mail.store(email_id, '+FLAGS', '\Seen')
     
-    # Đóng kết nối
     mail.logout()
 
-    # Trả về danh sách tiêu đề
     return jsonify(subjects)
 
 
