@@ -2,7 +2,7 @@ from flask import Flask, jsonify, request
 import pandas as pd
 import pymongo
 from config import Config
-
+import requests
 
 app = Flask(__name__)
 client = pymongo.MongoClient(Config.MONGO_URL)
@@ -38,8 +38,17 @@ def export_db():
 
 @app.route('/get-file-from-email')
 def get_file_from_email():
-    return "OK"
-    #Service mail trong config
+    try:
+        url = Config.SERVICE_EMAIL_DOWNLOAD+"/get-file"
+        response = requests.get(url)
+        
+        if response.status_code == 200:
+            data = response.json()
+            return jsonify({"status": "success", "data": data}), 200
+        else:
+            return jsonify({"status": "error", "message": "Failed to fetch file from email"}), response.status_code
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 
 @app.route('/')

@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, Response
+from flask import Flask, jsonify, request, Response, send_from_directory
 import pandas as pd
 import requests
 from config import Config
@@ -12,16 +12,36 @@ from config import Config
 app = Flask(__name__)
 
 
-@app.route('/send-file')
-def send_attachment():
+@app.route('/get-file')
+def get_file():
     download_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "download")
     files = os.listdir(download_folder)
-
+    
     if not files:
         return jsonify({"message": "No files to send."}), 404
     
-    return jsonify({"message": "Files sent successfully."})
+    file_name = files[0]
+    if not file_name.endswith('.csv'):
+        return jsonify({"message": "The file is not a CSV."}), 400
+    
+    file_path = os.path.join(download_folder, file_name)
+    try:
+        df = pd.read_csv(file_path)
 
+        columns = df.columns.tolist()
+        #print(f"Columns in CSV: {columns}")
+
+        if not all(col in df.columns for col in ['Date', 'Time', 'Heart Rate']):
+            return jsonify({
+                "message": "Missing required columns (Date, Time, Heart).",
+                "columns": ', '.join(columns)  # Chuyển danh sách columns thành chuỗi
+            }), 400
+        result = df[['Date', 'Time', 'Heart Rate']].to_dict(orient='records')
+        
+        return jsonify(result), 200
+    except Exception as e:
+        return jsonify({"message": f"Error reading CSV file: {str(e)}"}), 500
+    
 
 @app.route('/get-email')
 def get_email():
