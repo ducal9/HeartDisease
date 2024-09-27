@@ -1,39 +1,9 @@
 from flask import Flask, jsonify, request
 import pandas as pd
-import pymongo
 from config import Config
 import requests
 
 app = Flask(__name__)
-client = pymongo.MongoClient(Config.MONGO_URL)
-db = client.PRE
-collection = db.Heart_Disease_Data
-
-
-@app.route('/reset-db', methods=['GET'])
-def reset_db():
-    try:
-        collection.delete_many({})
-        return jsonify({"message": "Dữ liệu trong Heart_Disease_Data đã được xóa!"})
-    except Exception as e:
-        return jsonify({"message": "Đã xảy ra lỗi", "error": str(e)})
-
-
-@app.route('/import-db', methods=['POST'])
-def import_db():
-    try:
-        file = request.files['file']
-        df = pd.read_csv(file)
-        data = df.to_dict(orient='records')
-        collection.insert_many(data)
-        return jsonify({"message": "Dữ liệu đã được nhập thành công vào MongoDB!"})
-    except Exception as e:
-        return jsonify({"message": "Đã xảy ra lỗi", "error": str(e)})
-
-
-@app.route('/export-db')
-def export_db():
-    return "Đã xuất file thành công"
 
 
 @app.route('/get-file-from-email')
@@ -49,6 +19,11 @@ def get_file_from_email():
             return jsonify({"status": "error", "message": "Failed to fetch file from email"}), response.status_code
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
+
+
+@app.route('/get-report')
+def get_report():
+    return "Lấy báo cáo từ service-prediction"
 
 
 @app.route('/')
