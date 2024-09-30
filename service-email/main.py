@@ -108,7 +108,7 @@ def import_db():
 
 @app.route('/')
 def index():
-    return "This is Temp-Import-DB Service"
+    return "This is Email Service"
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=8072, debug=True)
