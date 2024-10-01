@@ -1,16 +1,18 @@
 from flask import Flask, jsonify, request
 import pandas as pd
-import pymongo
 from config import Config
+<<<<<<< HEAD
 from flask_cors import CORS
 import time
 import requests
+=======
+import requests
+
+>>>>>>> f70c6f510df56279bb84b08e00706d668a15befb
 app = Flask(__name__)
-client = pymongo.MongoClient(Config.MONGO_URL)
-db = client.PRE
-collection = db.Heart_Disease_Data
 
 
+<<<<<<< HEAD
 
 
 CORS(app)  # Cho phép CORS để React/Frontend có thể truy cập
@@ -45,28 +47,26 @@ def get_and_print_data():
 
 @app.route('/reset-db', methods=['GET'])
 def reset_db():
+=======
+@app.route('/get-file-from-email')
+def get_file_from_email():
+>>>>>>> f70c6f510df56279bb84b08e00706d668a15befb
     try:
-        collection.delete_many({})
-        return jsonify({"message": "Dữ liệu trong Heart_Disease_Data đã được xóa!"})
+        url = Config.SERVICE_EMAIL_DOWNLOAD+"/get-file"
+        response = requests.get(url)
+        
+        if response.status_code == 200:
+            data = response.json()
+            return jsonify({"status": "success", "data": data}), 200
+        else:
+            return jsonify({"status": "error", "message": "Failed to fetch file from email"}), response.status_code
     except Exception as e:
-        return jsonify({"message": "Đã xảy ra lỗi", "error": str(e)})
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 
-@app.route('/import-db', methods=['POST'])
-def import_db():
-    try:
-        file = request.files['file']
-        df = pd.read_csv(file)
-        data = df.to_dict(orient='records')
-        collection.insert_many(data)
-        return jsonify({"message": "Dữ liệu đã được nhập thành công vào MongoDB!"})
-    except Exception as e:
-        return jsonify({"message": "Đã xảy ra lỗi", "error": str(e)})
-
-
-@app.route('/export-db')
-def export_db():
-    return "Đã xuất file thành công"
+@app.route('/get-report')
+def get_report():
+    return "Lấy báo cáo từ service-prediction"
 
 
 @app.route('/')
