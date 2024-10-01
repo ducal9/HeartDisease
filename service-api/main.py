@@ -71,7 +71,7 @@ def get_report():
 
 @app.route('/')
 def index():
-    return "This is Import-DB Service"
+    return "This is API Service"
 
 
 if __name__ == '__main__':
