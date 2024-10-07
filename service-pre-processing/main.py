@@ -97,10 +97,11 @@ def do_pre_processing(data):
     print("Số lượng dữ liệu sau khi xử lý:", len(df))
 
     # Chuẩn hóa các cột giá trị liên tục
-    scaler = MinMaxScaler()
-    continuous_columns = ['age', 'trestbps', 'chol', 'thalach', 'oldpeak']
-    df[continuous_columns] = scaler.fit_transform(df[continuous_columns])
-    print(df.head())
+    # scaler = MinMaxScaler()
+    # continuous_columns = ['age', 'trestbps', 'chol', 'thalach', 'oldpeak']
+    # df[continuous_columns] = scaler.fit_transform(df[continuous_columns])
+    # print(df.head())
+    df = df.drop_duplicates()
 
     return df.to_dict(orient='records')
 
