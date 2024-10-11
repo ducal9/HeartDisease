@@ -23,7 +23,39 @@ def get_file_from_email():
 
 @app.route('/get-report')
 def get_report():
-    return "Lấy báo cáo từ service-prediction"
+    try:
+        # Lấy port từ Config
+        pre_processing_url = Config.SERVICE_PRE_PROCESSING+"/pre-processing"
+        
+        # Dữ liệu giả lập để gửi request (nếu cần)
+        data = [
+            {
+                "age": 45,
+                "sex": 1,
+                "cp": 3,
+                "trestbps": 130,
+                "chol": 250,
+                "fbs": 0,
+                "restecg": 1,
+                "thalach": 180,
+                "exang": 0,
+                "oldpeak": 2.3,
+                "slope": 1,
+                "ca": 0,
+                "thal": 2
+            }
+        ]
+
+        # Gửi request POST tới API /pre-processing
+        response = requests.post(pre_processing_url, json=data)
+
+        # Kiểm tra xem request có thành công không
+        if response.status_code == 200:
+            return jsonify(response.json())
+        else:
+            return jsonify({"message": "Có lỗi xảy ra khi gọi /pre-processing", "status_code": response.status_code})
+    except Exception as e:
+        return jsonify({"message": "Đã xảy ra lỗi", "error": str(e)})
 
 
 @app.route('/')
