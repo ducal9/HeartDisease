@@ -1,39 +1,11 @@
 from flask import Flask, jsonify, request
 from sklearn.preprocessing import MinMaxScaler
 import pandas as pd
-import pymongo
 from config import Config
 
 app = Flask(__name__)
 
-client = pymongo.MongoClient(Config.MONGO_URL)
-db = client.HDD
-collection = db.Heart_Disease_Data
 
-
-@app.route('/import-mongodb', methods=['POST'])
-def import_mongodb():
-    try:
-        data = request.get_json()
-        existing_data = []
-
-        for item in data:
-            query = {key: item[key] for key in item.keys() if key != '_id'}
-            if collection.find_one(query):
-                existing_data.append(item)
-        
-        data_to_insert = [item for item in data if item not in existing_data]
-        
-        if data_to_insert:
-            result = collection.insert_many(data_to_insert)
-            res = len(result.inserted_ids)
-        else:
-            res = 0
-
-        return jsonify({"message": "Success", "documents_insert": res, "documents_existing": len(existing_data)})
-    except Exception as e:
-        return jsonify({"message": "Đã xảy ra lỗi", "error": str(e)})
-    
 @app.route('/pre-processing', methods=['POST'])
 def pre_processing():
     try:
@@ -44,7 +16,10 @@ def pre_processing():
         return jsonify({"message": "Đã xảy ra lỗi", "error": str(e)})
     
 def do_pre_processing(data):
-    df = pd.DataFrame(data)
+    if isinstance(data, dict):
+        df = pd.DataFrame(data, index=[0])  
+    else:
+        df = pd.DataFrame(data)  
     # Kiểm tra thông tin về dữ liệu
     print(df.info())
     # Xem trước vài dòng đầu của dữ liệu
@@ -94,13 +69,14 @@ def do_pre_processing(data):
     #Thal (Thallium Stress Test Result)
     df = df[(df['thal'] >= 1) & (df['thal'] <= 3)]
 
-    print("Số lượng dữ liệu sau khi xử lý:", len(df))
-
     # Chuẩn hóa các cột giá trị liên tục
-    scaler = MinMaxScaler()
-    continuous_columns = ['age', 'trestbps', 'chol', 'thalach', 'oldpeak']
-    df[continuous_columns] = scaler.fit_transform(df[continuous_columns])
-    print(df.head())
+    # scaler = MinMaxScaler()
+    # continuous_columns = ['age', 'trestbps', 'chol', 'thalach', 'oldpeak']
+    # df[continuous_columns] = scaler.fit_transform(df[continuous_columns])
+    # print(df.head())
+    df = df.drop_duplicates()
+    df = df[sorted(df.columns)]
+    print("Số lượng dữ liệu sau khi xử lý:", len(df))
 
     return df.to_dict(orient='records')
 
