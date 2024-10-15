@@ -5,9 +5,9 @@ import requests
 
 app = Flask(__name__)
 
-
-@app.route('/get-file-from-email')
-def get_file_from_email():
+#API get email
+@app.route('/api-get-file-from-email')
+def api_get_file_from_email():
     try:
         url = Config.SERVICE_EMAIL_DOWNLOAD+"/get-file"
         response = requests.get(url)
@@ -20,43 +20,64 @@ def get_file_from_email():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
-
-@app.route('/get-report')
-def get_report():
+#API Predict
+@app.route('/api-predict', methods=['POST'])
+def api_predict(): 
+    data = request.get_json()
+    pre_processing_url = Config.SERVICE_PRE_PROCESSING + "/pre-processing"
     try:
-        # Lấy port từ Config
-        pre_processing_url = Config.SERVICE_PRE_PROCESSING+"/pre-processing"
-        
-        # Dữ liệu giả lập để gửi request (nếu cần)
-        data = [
-            {
-                "age": 45,
-                "sex": 1,
-                "cp": 3,
-                "trestbps": 130,
-                "chol": 250,
-                "fbs": 0,
-                "restecg": 1,
-                "thalach": 180,
-                "exang": 0,
-                "oldpeak": 2.3,
-                "slope": 1,
-                "ca": 0,
-                "thal": 2
-            }
-        ]
+        pre_processing_response = requests.post(pre_processing_url, json=data)
+        if pre_processing_response.status_code == 200:
+            processed_data = pre_processing_response.json()
+            print(processed_data)
+            predict_url = Config.SERVICE_PREDICTION+"/predict"
 
-        # Gửi request POST tới API /pre-processing
-        response = requests.post(pre_processing_url, json=data)
+            predict_response = requests.post(predict_url, json=processed_data)
 
-        # Kiểm tra xem request có thành công không
-        if response.status_code == 200:
-            return jsonify(response.json())
+            if predict_response.status_code == 200:
+                return jsonify({"Success": "Success", "data": predict_response.json()}), 200
+            else:
+                return jsonify({"error": "Failed to call predict service", "status_code": predict_response.status_code, "response": predict_response.text}), predict_response.status_code
         else:
-            return jsonify({"message": "Có lỗi xảy ra khi gọi /pre-processing", "status_code": response.status_code})
+            return jsonify({"error": "Failed to call pre-processing service", "status_code": pre_processing_response.status_code, "response": pre_processing_response.text}), pre_processing_response.status_code
     except Exception as e:
-        return jsonify({"message": "Đã xảy ra lỗi", "error": str(e)})
+        return jsonify({"error": "Đã xảy ra lỗi", "message": str(e)}), 500
 
+
+#API Training-data
+@app.route('/api-training-data', methods=['POST'])
+def api_training_data():
+    if 'file' not in request.files:
+        return jsonify({"error": "No file part"}), 400
+
+    file = request.files['file']
+    
+    if not file.filename or not file.filename.lower().endswith('.csv'):
+        return jsonify({"error": "File is not CSV or no file selected"}), 400
+
+    files = {'file': (file.filename, file.stream, 'text/csv')}
+    
+    try:
+        df = pd.read_csv(file)
+        data_json = df.to_dict(orient='records')
+        pre_processing_url = Config.SERVICE_PRE_PROCESSING + "/pre-processing"
+        
+        pre_processing_response = requests.post(pre_processing_url, json=data_json)
+        if pre_processing_response.status_code != 200:
+            return jsonify({"error": "Pre-processing failed", "response": pre_processing_response.json()}), pre_processing_response.status_code
+        
+        training_data = pre_processing_response.json()
+        training_url = Config.SERVICE_PREDICTION+"/training"
+
+        training_response = requests.post(training_url, json=training_data)
+        
+        if training_response.status_code != 200:
+            return jsonify({"error": "Training failed", "response": training_response.json()}), training_response.status_code
+        
+        return jsonify({"message": "File processed and trained successfully", "response": training_response.json()}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
 
 @app.route('/')
 def index():
@@ -65,7 +86,7 @@ def index():
 
 if __name__ == '__main__':
      # Chạy luồng lấy dữ liệu từ React
-    from threading import Thread
-    data_thread = Thread(target=get_and_print_data)
-    data_thread.start()
-    app.run(host='127.0.0.1', port=8032)
+    #from threading import Thread
+    #data_thread = Thread(target=get_and_print_data)
+    #data_thread.start()
+    app.run(host='127.0.0.1', port=8032, debug=True)
