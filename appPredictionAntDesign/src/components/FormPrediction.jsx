@@ -45,7 +45,7 @@ export class FormPrediction extends Component {
 
   handleSubmit = async (formData) => {
     try {
-      const response = await fetch('http://localhost:5000/api/predict', {
+      const response = await fetch('http://localhost:8032/api/predict', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
