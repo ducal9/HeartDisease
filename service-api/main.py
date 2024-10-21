@@ -26,7 +26,7 @@ def api_get_file_from_email():
 def api_test(): 
     data = request.get_json()
     print(data)
-    return jsonify({"Success": "Success", "data": data})
+    return jsonify({"Success": "Success-200", "data": data})
             
 #API Predict
 @app.route('/api-predict', methods=['POST'])
