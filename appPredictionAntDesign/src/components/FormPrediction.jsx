@@ -5,6 +5,7 @@ import StepFinish from './step/StepFinish';
 
 export class FormPrediction extends Component {
   state = {
+    prediction:null,
     step: 0,
     // age: '', //input
     // sex: '', // autocomplete
@@ -71,14 +72,18 @@ export class FormPrediction extends Component {
       }
 
       const data = await response.json();
-      console.log('API Response:', data);
+      const {prediction} = this.state;
+      this.setState({
+        prediction: data.data.prediction,
+      });
+      console.log('API Response:', data.data.prediction);
     } catch (error) {
       console.error('Error sending data to API:', error);
     }
   };
 
   render() {
-    const { step } = this.state;
+    const { step,prediction } = this.state;
     const {
       // age,
       // sex,
@@ -143,6 +148,7 @@ export class FormPrediction extends Component {
           />
         );
       case 2:
+        console.log(prediction)
         return (
           <StepFinish
             nextStep={this.nextStep}
@@ -150,6 +156,7 @@ export class FormPrediction extends Component {
             step={step}
             values={values}
             handleSubmit={this.handleSubmit}
+            prediction={prediction}
           />
         );
     }

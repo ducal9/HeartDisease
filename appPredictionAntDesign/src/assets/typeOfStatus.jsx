@@ -1,6 +1,6 @@
 export const dataSex = [
   { value: 0, title: 'Nữ' },
-  { value: 0, title: 'Nam' },
+  { value: 1, title: 'Nam' },
 ];
 
 export const dataChestPainType = [
