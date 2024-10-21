@@ -110,8 +110,8 @@ export class StepTwo extends Component {
                 <Col className='gutter-row' span={12}>
                   <Form.Item label='Chest Pain Type'>
                     <Select
-                      onChange={handleChangeSelect('chestPainType')}
-                      value={values.chestPainType}
+                      onChange={handleChangeSelect('cp')}
+                      value={values.cp}
                     >
                       {dataChestPainType.map((item) => (
                         <Select.Option key={item.value} value={item.value}>
@@ -124,8 +124,8 @@ export class StepTwo extends Component {
                 <Col className='gutter-row' span={12}>
                   <Form.Item label='Fasting Blood Sugar'>
                     <Select
-                      onChange={handleChangeSelect('fastingBloodSugar')}
-                      value={values.fastingBloodSugar}
+                      onChange={handleChangeSelect('fbs')}
+                      value={values.fbs}
                     >
                       {dataFastingBloodSugar.map((item) => (
                         <Select.Option key={item.value} value={item.value}>
@@ -139,9 +139,9 @@ export class StepTwo extends Component {
                   <Form.Item label='Electrocardiographic '>
                     <Select
                       onChange={handleChangeSelect(
-                        'restingElectrocardiographicResults'
+                        'restecg'
                       )}
-                      value={values.restingElectrocardiographicResults}
+                      value={values.restecg}
                     >
                       {dataElectrocardiographicResults.map((item) => (
                         <Select.Option key={item.value} value={item.value}>
@@ -154,8 +154,8 @@ export class StepTwo extends Component {
                 <Col className='gutter-row' span={12}>
                   <Form.Item label='Exercise Induced Angina'>
                     <Select
-                      onChange={handleChangeSelect('exerciseInducedAngina')}
-                      value={values.exerciseInducedAngina}
+                      onChange={handleChangeSelect('exang')}
+                      value={values.exang}
                     >
                       {dataExerciseInducedAngina.map((item) => (
                         <Select.Option key={item.value} value={item.value}>
@@ -169,9 +169,9 @@ export class StepTwo extends Component {
                   <Form.Item label='ExcersiseSTSegment'>
                     <Select
                       onChange={handleChangeSelect(
-                        'slopeOfThePeakExcersiseSTSegment'
+                        'slope'
                       )}
-                      value={values.slopeOfThePeakExcersiseSTSegment}
+                      value={values.slope}
                     >
                       {dataSlopeOfPeakExerciseSTSegment.map((item) => (
                         <Select.Option key={item.value} value={item.value}>
@@ -184,8 +184,8 @@ export class StepTwo extends Component {
                 <Col className='gutter-row' span={12}>
                   <Form.Item label='Major Vessels'>
                     <Select
-                      onChange={handleChangeSelect('numberOfMajorVessels')}
-                      value={values.numberOfMajorVessels}
+                      onChange={handleChangeSelect('ca')}
+                      value={values.ca}
                     >
                       {dataNumberMajorVessels.map((item) => (
                         <Select.Option key={item.value} value={item.value}>
@@ -198,8 +198,8 @@ export class StepTwo extends Component {
                 <Col className='gutter-row' span={12}>
                   <Form.Item label='Thalium Stress'>
                     <Select
-                      onChange={handleChangeSelect('thaliumStressTestResult')}
-                      value={values.thaliumStressTestResult}
+                      onChange={handleChangeSelect('thal')}
+                      value={values.thal}
                     >
                       {dataThal.map((item) => (
                         <Select.Option key={item.value} value={item.value}>

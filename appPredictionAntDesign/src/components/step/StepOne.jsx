@@ -101,8 +101,8 @@ export class StepOne extends Component {
                   >
                     <Input
                       name='restingBloodPressure'
-                      value={values.restingBloodPressure}
-                      onChange={handleChange('restingBloodPressure')}
+                      value={values.trestbps}
+                      onChange={handleChange('trestbps')}
                     />
                   </Form.Item>
                 </Col>
@@ -119,8 +119,8 @@ export class StepOne extends Component {
                   >
                     <Input
                       name='serumCholesterol'
-                      value={values.serumCholesterol}
-                      onChange={handleChange('serumCholesterol')}
+                      value={values.chol}
+                      onChange={handleChange('chol')}
                     />
                   </Form.Item>
                 </Col>
@@ -137,8 +137,8 @@ export class StepOne extends Component {
                   >
                     <Input
                       name='maximumHeartRateAchieved'
-                      value={values.maximumHeartRateAchieved}
-                      onChange={handleChange('maximumHeartRateAchieved')}
+                      value={values.thalach}
+                      onChange={handleChange('thalach')}
                     />
                   </Form.Item>
                 </Col>
@@ -155,8 +155,8 @@ export class StepOne extends Component {
                   >
                     <Input
                       name='oldPeak'
-                      value={values.oldPeak}
-                      onChange={handleChange('oldPeak')}
+                      value={values.oldpeak}
+                      onChange={handleChange('oldpeak')}
                     />
                   </Form.Item>
                 </Col>
