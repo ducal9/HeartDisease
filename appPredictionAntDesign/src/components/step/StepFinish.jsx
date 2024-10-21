@@ -27,7 +27,7 @@ export class StepFinish extends Component {
   }
 
   render() {
-    const { values, step, handleSubmit } = this.props;
+    const { values, step, handleSubmit,prediction } = this.props;
     const description = 'This is a description.';
     return (
       <div
@@ -84,7 +84,7 @@ export class StepFinish extends Component {
               <Result
                 status='success'
                 title='Successfully '
-                subTitle='We will send the result after some minutes'
+                subTitle={prediction == null?'We will send the result after some minutes':prediction==1?"CO benh" : "Khong benh"}
                 extra={[
                   <Button type='primary' key='console' onClick={this.back}>
                     Back

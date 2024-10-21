@@ -5,20 +5,34 @@ import StepFinish from './step/StepFinish';
 
 export class FormPrediction extends Component {
   state = {
+    prediction:null,
     step: 0,
-    age: '', //input
-    sex: '', // autocomplete
-    chestPainType: '', // autocomplete
-    restingBloodPressure: '', //input
-    serumCholesterol: '', //input
-    fastingBloodSugar: '', // autocomplete
-    restingElectrocardiographicResults: '', // autocomplete
-    maximumHeartRateAchieved: '', //input
-    exerciseInducedAngina: '', // autocomplete
-    oldPeak: '', //input
-    slopeOfThePeakExcersiseSTSegment: '', // autocomplete
-    numberOfMajorVessels: '', // autocomplete
-    thaliumStressTestResult: '', // autocomplete
+    // age: '', //input
+    // sex: '', // autocomplete
+    // chestPainType: '', // autocomplete
+    // restingBloodPressure: '', //input
+    // serumCholesterol: '', //input
+    // fastingBloodSugar: '', // autocomplete
+    // restingElectrocardiographicResults: '', // autocomplete
+    // maximumHeartRateAchieved: '', //input
+    // exerciseInducedAngina: '', // autocomplete
+    // oldPeak: '', //input
+    // slopeOfThePeakExcersiseSTSegment: '', // autocomplete
+    // numberOfMajorVessels: '', // autocomplete
+    // thaliumStressTestResult: '', // autocomplete
+    age: null,
+    ca: 0,
+    chol: null,
+    cp: 0,
+    exang: 0,
+    fbs: 0,
+    oldpeak: null,
+    restecg: 0,
+    sex: 0,
+    slope: 0,
+    thal: 1,
+    thalach: null,
+    trestbps: null,
   };
   nextStep = () => {
     const { step } = this.state;
@@ -36,7 +50,7 @@ export class FormPrediction extends Component {
   handleChange = (input) => (e) => {
     console.log({ [input]: e.target.value });
 
-    this.setState({ [input]: e.target.value });
+    this.setState({ [input]: parseInt(e.target.value) });
   };
 
   handleChangeSelect = (input) => (value) => {
@@ -45,7 +59,7 @@ export class FormPrediction extends Component {
 
   handleSubmit = async (formData) => {
     try {
-      const response = await fetch('http://localhost:8032/api/predict', {
+      const response = await fetch('http://127.0.0.1:8032/api-predict', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -58,43 +72,60 @@ export class FormPrediction extends Component {
       }
 
       const data = await response.json();
-      console.log('API Response:', data);
+      const {prediction} = this.state;
+      this.setState({
+        prediction: data.data.prediction,
+      });
+      console.log('API Response:', data.data.prediction);
     } catch (error) {
       console.error('Error sending data to API:', error);
     }
   };
 
   render() {
-    const { step } = this.state;
+    const { step,prediction } = this.state;
     const {
+      // age,
+      // sex,
+      // chestPainType,
+      // restingBloodPressure,
+      // serumCholesterol,
+      // fastingBloodSugar,
+      // restingElectrocardiographicResults,
+      // maximumHeartRateAchieved,
+      // exerciseInducedAngina,
+      // oldPeak,
+      // slopeOfThePeakExcersiseSTSegment,
+      // numberOfMajorVessels,
+      // thaliumStressTestResult,
       age,
+      ca,
+      chol,
+      cp,
+      exang,
+      fbs,
+      oldpeak,
+      restecg,
       sex,
-      chestPainType,
-      restingBloodPressure,
-      serumCholesterol,
-      fastingBloodSugar,
-      restingElectrocardiographicResults,
-      maximumHeartRateAchieved,
-      exerciseInducedAngina,
-      oldPeak,
-      slopeOfThePeakExcersiseSTSegment,
-      numberOfMajorVessels,
-      thaliumStressTestResult,
+      slope,
+      thal,
+      thalach,
+      trestbps,
     } = this.state;
     const values = {
-      age,
-      sex,
-      chestPainType,
-      restingBloodPressure,
-      serumCholesterol,
-      fastingBloodSugar,
-      restingElectrocardiographicResults,
-      maximumHeartRateAchieved,
-      exerciseInducedAngina,
-      oldPeak,
-      slopeOfThePeakExcersiseSTSegment,
-      numberOfMajorVessels,
-      thaliumStressTestResult,
+      age,// age,
+      ca,// numberOfMajorVessels,
+      chol,// serumCholesterol,
+      cp,// chestPainType,
+      exang,// exerciseInducedAngina,
+      fbs,// fastingBloodSugar,
+      oldpeak,// oldPeak,
+      restecg,// restingElectrocardiographicResults,
+      sex,// sex,
+      slope,// slopeOfThePeakExcersiseSTSegment,
+      thal,// thaliumStressTestResult,
+      thalach,// maximumHeartRateAchieved,
+      trestbps, // restingBloodPressure,
     };
     switch (step) {
       case 0:
@@ -117,6 +148,7 @@ export class FormPrediction extends Component {
           />
         );
       case 2:
+        console.log(prediction)
         return (
           <StepFinish
             nextStep={this.nextStep}
@@ -124,6 +156,7 @@ export class FormPrediction extends Component {
             step={step}
             values={values}
             handleSubmit={this.handleSubmit}
+            prediction={prediction}
           />
         );
     }

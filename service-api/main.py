@@ -2,9 +2,10 @@ from flask import Flask, jsonify, request
 import pandas as pd
 from config import Config
 import requests
+from flask_cors import CORS
 
 app = Flask(__name__)
-
+CORS(app)
 #API get email
 @app.route('/api-get-file-from-email')
 def api_get_file_from_email():
@@ -20,6 +21,13 @@ def api_get_file_from_email():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
+
+@app.route('/api-test', methods=['POST'])
+def api_test(): 
+    data = request.get_json()
+    print(data)
+    return jsonify({"Success": "Success-200", "data": data})
+            
 #API Predict
 @app.route('/api-predict', methods=['POST'])
 def api_predict(): 
