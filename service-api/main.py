@@ -69,20 +69,39 @@ def api_training_data():
         df = pd.read_csv(file)
         data_json = df.to_dict(orient='records')
         pre_processing_url = Config.SERVICE_PRE_PROCESSING + "/pre-processing"
+        pre_processing_url_v2 = Config.SERVICE_PRE_PROCESSING + "/pre-processing-v2"
         
         pre_processing_response = requests.post(pre_processing_url, json=data_json)
-        if pre_processing_response.status_code != 200:
-            return jsonify({"error": "Pre-processing failed", "response": pre_processing_response.json()}), pre_processing_response.status_code
+        pre_processing_response_v2 = requests.post(pre_processing_url_v2, json=data_json)
+        if pre_processing_response.status_code != 200 and pre_processing_response_v2.status_code != 200:
+            error_responses = {
+                "pre-processing": pre_processing_response.json() if pre_processing_response.status_code != 200 else "Success",
+                "pre-processing-v2": pre_processing_response_v2.json() if pre_processing_response_v2.status_code != 200 else "Success"
+            }
+            return jsonify({"error": "Pre-processing failed", "responses": error_responses}), 400
         
         training_data = pre_processing_response.json()
+        training_data_v2 = pre_processing_response_v2.json()
         training_url = Config.SERVICE_PREDICTION+"/training"
-
+        training_url_v2 = Config.SERVICE_PREDICTION+"/training-v2"
+        
         training_response = requests.post(training_url, json=training_data)
+        training_response_v2 = requests.post(training_url_v2, json=training_data_v2)
         
-        if training_response.status_code != 200:
-            return jsonify({"error": "Training failed", "response": training_response.json()}), training_response.status_code
-        
-        return jsonify({"message": "File processed and trained successfully", "response": training_response.json()}), 200
+        if training_response.status_code != 200 or training_response_v2.status_code != 200:
+            error_responses = {
+                "training": training_response.json() if training_response.status_code != 200 else "Success",
+                "training-v2": training_response_v2.json() if training_response_v2.status_code != 200 else "Success"
+            }
+            return jsonify({"error": "Training failed", "responses": error_responses}), 400
+
+        # Success response
+        responses = {
+            "training": training_response.json(),
+            "training-v2": training_response_v2.json()
+        }
+        return jsonify({"message": "File processed and trained successfully", "responses": responses}), 200
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     

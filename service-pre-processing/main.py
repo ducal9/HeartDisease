@@ -14,7 +14,26 @@ def pre_processing():
         return jsonify(res) 
     except Exception as e:
         return jsonify({"message": "Đã xảy ra lỗi", "error": str(e)})
-    
+
+@app.route('/pre-processing-v2', methods=['POST'])
+def pre_processing_v2():
+    try:
+        data = request.get_json()
+        res = do_pre_processing(data)
+        
+        # Chuyển đổi các cột liên tục bằng MinMaxScaler
+        scaler = MinMaxScaler()
+        continuous_columns = ['age', 'trestbps', 'chol', 'thalach', 'oldpeak']
+        
+        res_df = pd.DataFrame(res)
+        if all(col in res_df.columns for col in continuous_columns):
+            res_df[continuous_columns] = scaler.fit_transform(res_df[continuous_columns])
+        
+        print(res_df.head())
+        return jsonify(res_df.to_dict(orient='records'))  # Trả về JSON cho danh sách các bản ghi
+    except Exception as e:
+        return jsonify({"message": "Đã xảy ra lỗi", "error": str(e)})
+
 def do_pre_processing(data):
     if isinstance(data, dict):
         df = pd.DataFrame(data, index=[0])  
@@ -69,11 +88,6 @@ def do_pre_processing(data):
     #Thal (Thallium Stress Test Result)
     df = df[(df['thal'] >= 1) & (df['thal'] <= 3)]
 
-    # Chuẩn hóa các cột giá trị liên tục
-    # scaler = MinMaxScaler()
-    # continuous_columns = ['age', 'trestbps', 'chol', 'thalach', 'oldpeak']
-    # df[continuous_columns] = scaler.fit_transform(df[continuous_columns])
-    # print(df.head())
     df = df.drop_duplicates()
     df = df[sorted(df.columns)]
     print("Số lượng dữ liệu sau khi xử lý:", len(df))
