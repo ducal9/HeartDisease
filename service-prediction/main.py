@@ -114,16 +114,6 @@ def training_v2():
         }
     })
 
-#def load_model():
-#    if os.path.exists(MODEL_FILE):
-#        return joblib.load(MODEL_FILE)
-#    else:
-#        raise Exception("Model file not found!")
-#TRAINING_FOLDER_V2 = os.path.join(BASE_DIR, 'training_v2')
-#MODEL_FILES = {
-#    'knn': os.path.join(TRAINING_FOLDER_V2, 'knn_model.pkl'),
-#    'logistic_regression': os.path.join(TRAINING_FOLDER_V2, 'logistic_regression_model.pkl')
-#}
 def load_models(model_name):
     if model_name in MODEL_FILES:
         model_path = MODEL_FILES[model_name]
