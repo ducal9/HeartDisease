@@ -51,6 +51,64 @@ def api_predict():
     except Exception as e:
         return jsonify({"error": "Đã xảy ra lỗi", "message": str(e)}), 500
 
+#API Predict V2
+@app.route('/api-predict-v2', methods=['POST'])
+def api_predict_v2(): 
+    data = request.get_json()
+    pre_processing_url = Config.SERVICE_PRE_PROCESSING + "/pre-processing"
+    pre_processing_maxmin_url = Config.SERVICE_PRE_PROCESSING + "/pre-processing-maxmin"
+    try:
+        pre_processing_response = requests.post(pre_processing_url, json=data)
+        pre_processing_maxmin_response = requests.post(pre_processing_maxmin_url, json=data)
+        if pre_processing_response.status_code == 200 and pre_processing_maxmin_response.status_code == 200:
+            processed_data = pre_processing_response.json()
+            processed_data_maxmin = pre_processing_maxmin_response.json()
+            print(processed_data)
+            print(processed_data_maxmin)
+            
+            predict_url = Config.SERVICE_PREDICTION+"/predict"
+            predict_maxmin_url = Config.SERVICE_PREDICTION+"/predict-maxmin"
+            
+            predict_response = requests.post(predict_url, json=processed_data)
+            predict_maxmin_response = requests.post(predict_maxmin_url, json=processed_data)
+            if predict_maxmin_response.status_code == 200 and predict_response.status_code == 200:
+                predict_maxmin_predictions = predict_maxmin_response.json().get("predictions", [])
+                predict_response_prediction = predict_response.json().get("prediction")
+
+                all_predictions = predict_maxmin_predictions + [str(predict_response_prediction)]
+                vote_counts = {value: all_predictions.count(value) for value in set(all_predictions)}
+
+                majority_vote = max(vote_counts, key=vote_counts.get)
+        
+                return jsonify({
+                    "Success": "Success",
+                    "result": majority_vote,
+                    "predict_maxmin_response_data": predict_maxmin_response.json(),
+                    "predict_response_data": predict_response.json()
+                }), 200
+            else:
+                error_message = {
+                    "error": "Failed to call predict service",
+                    "status_code_predict": predict_response.status_code,
+                    "response_predict": predict_response.text,
+                    "status_code_predict_maxmin": predict_maxmin_response.status_code,
+                    "response_predict_maxmin": predict_maxmin_response.text
+                }
+                return jsonify(error_message), 400  # Trả về mã lỗi 400 khi có sự cố
+        else:
+            return jsonify({
+                "error": "Failed to call pre-processing service",
+                "status_code": {
+                    "pre_processing": pre_processing_response.status_code,
+                    "pre_processing_maxmin": pre_processing_maxmin_response.status_code
+                },
+                "response": {
+                    "pre_processing": pre_processing_response.text,
+                    "pre_processing_maxmin": pre_processing_maxmin_response.text
+                }
+            }), max(pre_processing_response.status_code, pre_processing_maxmin_response.status_code)
+    except Exception as e:
+        return jsonify({"error": "Đã xảy ra lỗi", "message": str(e)}), 500
 
 #API Training-data
 @app.route('/api-training-data', methods=['POST'])

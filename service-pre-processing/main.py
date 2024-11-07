@@ -2,9 +2,13 @@ from flask import Flask, jsonify, request
 from sklearn.preprocessing import MinMaxScaler
 import pandas as pd
 from config import Config
+from pymongo import MongoClient
 
 app = Flask(__name__)
 
+client = MongoClient('mongodb+srv://mcv:mcv@cluster0.cena4mj.mongodb.net/')  # Sửa URL nếu cần
+db = client['HD_DB']  # Đặt tên database MongoDB
+collection = db['Data']  # Đặt tên collection MongoDB
 
 @app.route('/pre-processing', methods=['POST'])
 def pre_processing():
@@ -24,8 +28,10 @@ def pre_processing_v2():
         # Chuyển đổi các cột liên tục bằng MinMaxScaler
         scaler = MinMaxScaler()
         continuous_columns = ['age', 'trestbps', 'chol', 'thalach', 'oldpeak']
-        
         res_df = pd.DataFrame(res)
+        processed_data = res_df.to_dict(orient='records')
+        collection.delete_many({})
+        collection.insert_many(processed_data)
         if all(col in res_df.columns for col in continuous_columns):
             res_df[continuous_columns] = scaler.fit_transform(res_df[continuous_columns])
         
@@ -33,6 +39,37 @@ def pre_processing_v2():
         return jsonify(res_df.to_dict(orient='records'))  # Trả về JSON cho danh sách các bản ghi
     except Exception as e:
         return jsonify({"message": "Đã xảy ra lỗi", "error": str(e)})
+
+@app.route('/pre-processing-maxmin', methods=['POST'])
+def pre_processing_maxmin():
+    try:
+        data = request.get_json()
+        all_data = list(collection.find())
+        df = pd.DataFrame(all_data)
+        if '_id' in df.columns:
+            df = df.drop(columns=['_id'])
+        print("Cột trong DataFrame:", df.columns.tolist())
+        
+        continuous_columns = ['age', 'trestbps', 'chol', 'thalach', 'oldpeak']
+        missing_columns = [col for col in continuous_columns if col not in df.columns]
+        if missing_columns:
+            return jsonify({"message": "Thiếu các cột: " + ", ".join(missing_columns)}), 400
+        
+        scaler = MinMaxScaler()
+        scaler.fit(df[continuous_columns])
+
+        input_df = pd.DataFrame(data) 
+
+        if not all(col in input_df.columns for col in continuous_columns):
+            return jsonify({"message": "Bản ghi đầu vào thiếu các cột cần thiết."}), 400
+        
+        input_df[continuous_columns] = scaler.transform(input_df[continuous_columns])
+        processed_record = input_df.to_dict(orient='records')[0]
+        
+        return jsonify(processed_record)
+    
+    except Exception as e:
+        return jsonify({"message": "Đã xảy ra lỗi", "error": str(e)}), 500
 
 def do_pre_processing(data):
     if isinstance(data, dict):

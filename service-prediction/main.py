@@ -32,12 +32,6 @@ def train_model(df):
     print(f"Độ tin cậy của mô hình: {accuracy:.2f}")
     return accuracy
 
-def load_model():
-    if os.path.exists(MODEL_FILE):
-        return joblib.load(MODEL_FILE)
-    else:
-        raise Exception("Model file not found!")
-
 #Training
 @app.route('/training', methods=['POST'])
 def training():
@@ -48,6 +42,12 @@ def training():
     print(df.head())
     return jsonify({"message": "Model trained successfully!", "accuracy": f"{accuracy:.2f}"})
 
+def load_model():
+    if os.path.exists(MODEL_FILE):
+        return joblib.load(MODEL_FILE)
+    else:
+        raise Exception("Model file not found!")
+    
 #Predict
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -114,7 +114,40 @@ def training_v2():
         }
     })
 
-#Predict v2
-
+#def load_model():
+#    if os.path.exists(MODEL_FILE):
+#        return joblib.load(MODEL_FILE)
+#    else:
+#        raise Exception("Model file not found!")
+#TRAINING_FOLDER_V2 = os.path.join(BASE_DIR, 'training_v2')
+#MODEL_FILES = {
+#    'knn': os.path.join(TRAINING_FOLDER_V2, 'knn_model.pkl'),
+#    'logistic_regression': os.path.join(TRAINING_FOLDER_V2, 'logistic_regression_model.pkl')
+#}
+def load_models(model_name):
+    if model_name in MODEL_FILES:
+        model_path = MODEL_FILES[model_name]
+        if os.path.exists(model_path):
+            return joblib.load(model_path)
+        else:
+            raise Exception(f"Model file {model_name} not found!")
+    else:
+        raise Exception(f"Model {model_name} is not defined!")
+    
+#Predict
+@app.route('/predict-maxmin', methods=['POST'])
+def predict_maxmin():
+    data = request.get_json()
+    df = pd.DataFrame(data, index=[0])
+    result = []
+    for model_name in MODEL_FILES:
+        try:
+            model = load_models(model_name)
+            prediction = model.predict(df)
+            result.append(str(prediction[0])) 
+        except Exception as e:
+            return jsonify({'error': f"Error with model {model_name}: {str(e)}"}), 400
+    return jsonify({'predictions': result})
+    
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=8031, debug=True)
