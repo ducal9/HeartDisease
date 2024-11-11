@@ -79,12 +79,13 @@ def api_predict_v2():
                 vote_counts = {value: all_predictions.count(value) for value in set(all_predictions)}
 
                 majority_vote = max(vote_counts, key=vote_counts.get)
-        
+                print("predict_maxmin_response_data: " + str(predict_maxmin_response.json()) + " , " +
+                      "predict_response_data: " + str(predict_response.json()))
                 return jsonify({
                     "Success": "Success",
-                    "result": majority_vote,
-                    "predict_maxmin_response_data": predict_maxmin_response.json(),
-                    "predict_response_data": predict_response.json()
+                    "data": {
+                        "prediction": int(majority_vote)  # Chuyển 'majority_vote' thành số nguyên nếu cần
+                    }
                 }), 200
             else:
                 error_message = {
