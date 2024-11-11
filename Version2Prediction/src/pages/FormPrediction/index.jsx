@@ -28,7 +28,7 @@ function FormPrediction() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const predictResult = async (state) => {
-    const response = await fetch('http://127.0.0.1:8031/predict', {
+    const response = await fetch('http://127.0.0.1:8032/api-predict', {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -57,8 +57,11 @@ function FormPrediction() {
   const showModal = async () => {
     setIsModalOpen(true);
     const result = await predictResult(state);
-    console.log(result.prediction);
-    setState((prevState) => ({ ...prevState, prediction: result.prediction }));
+    console.log(result.data.prediction);
+    setState((prevState) => ({
+      ...prevState,
+      prediction: result.data.prediction,
+    }));
     setTimeout(() => {
       setLoading(false);
     }, 1500);
@@ -156,7 +159,7 @@ function FormPrediction() {
           </Button>
         }
       >
-        <p>
+        <div>
           {isLoading ? (
             <div className='spin'>
               <Spin indicator={<LoadingOutlined spin />} size='large' />
@@ -167,24 +170,24 @@ function FormPrediction() {
                 ? `Prediction: ${state.prediction}`
                 : 'Loading...'} */}
               <div className='notify'>
-                <p className='notify-item notify-hello'>
-                  Xin chào, <b>{state.name}</b>
-                </p>
-                <p className='notify-item  notify-body'>
+                <div className='notify-item notify-hello'>
+                  Xin chào, <strong>{state.name}</strong>
+                </div>
+                <div className='notify-item  notify-body'>
                   Theo như chỉ số bạn cung cấp chúng tôi dự đoán rằng:
-                  <div>
-                    <b>
-                      Bạn
-                      {state.prediction
-                        ? ` đang có nguy cơ mắc bệnh tim`
-                        : ' không có nguy cơ mắc bệnh tim'}
-                    </b>
-                  </div>
-                </p>
+                </div>
+                <div>
+                  <strong>
+                    Bạn
+                    {state.prediction
+                      ? ` đang có nguy cơ mắc bệnh tim`
+                      : ' không có nguy cơ mắc bệnh tim'}
+                  </strong>
+                </div>
               </div>
             </>
           )}
-        </p>
+        </div>
       </Modal>
     </>
   );

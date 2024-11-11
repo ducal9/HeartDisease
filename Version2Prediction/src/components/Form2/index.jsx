@@ -35,7 +35,7 @@ function Form2({ prevPage, nextPage, direction, updateState, values }) {
                   className='form-input__value-input'
                   placeholder='Basic usage'
                   onChange={(e) => {
-                    updateState('age', e.target.value);
+                    updateState('age', parseInt(e.target.value));
                   }}
                 />
               </div>
@@ -49,7 +49,7 @@ function Form2({ prevPage, nextPage, direction, updateState, values }) {
                   className='form-input__value-input'
                   placeholder='Basic usage'
                   onChange={(e) => {
-                    updateState('trestbps', e.target.value);
+                    updateState('trestbps', parseInt(e.target.value));
                   }}
                 />
               </div>
@@ -65,7 +65,7 @@ function Form2({ prevPage, nextPage, direction, updateState, values }) {
                   className='form-input__value-input'
                   placeholder='Basic usage'
                   onChange={(e) => {
-                    updateState('chol', e.target.value);
+                    updateState('chol', parseInt(e.target.value));
                   }}
                 />
               </div>
@@ -79,7 +79,7 @@ function Form2({ prevPage, nextPage, direction, updateState, values }) {
                   className='form-input__value-input'
                   placeholder='Basic usage'
                   onChange={(e) => {
-                    updateState('thalach', e.target.value);
+                    updateState('thalach', parseInt(e.target.value));
                   }}
                 />
               </div>
@@ -91,7 +91,7 @@ function Form2({ prevPage, nextPage, direction, updateState, values }) {
                   className='form-input__value-input'
                   placeholder='Basic usage'
                   onChange={(e) => {
-                    updateState('oldpeak', e.target.value);
+                    updateState('oldpeak', parseInt(e.target.value));
                   }}
                 />
               </div>
