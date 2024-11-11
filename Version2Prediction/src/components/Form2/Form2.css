@@ -1,0 +1,20 @@
+/* .form-input{
+    border: 1px solid #d32e2e;
+} */
+
+.form-input__value{
+    /* border: 1px solid #d32e2e;
+    margin: 2px; */
+    min-height: 301px;
+}
+
+.form-input__value-item{
+    margin: 20px 40px;
+}
+
+.button-control{
+    text-align: center;
+}
+.button-control__item{
+    margin: 0 20px;
+}

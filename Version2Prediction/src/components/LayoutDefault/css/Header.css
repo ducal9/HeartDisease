@@ -1,0 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Abel&family=Bangers&family=Bebas+Neue&family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap');
+.header{
+    background: #cfe2ff;
+    padding: 15px;
+}
+
+.header-logo{
+    display: flex;
+    align-items: center;
+    font-size: 25px;
+}
+.header-logo__name{
+    font-family: "Bebas Neue", serif;
+    padding-left: 10px;
+    font-size: 25px;
+}
