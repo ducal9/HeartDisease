@@ -1,0 +1,12 @@
+.form-welcome{}
+
+#image{height: 300px;}
+
+.form-welcome__image{
+   padding: 10px;
+   text-align: center;
+}
+
+#button-next{
+    text-align: center;
+}

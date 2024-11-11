@@ -1,0 +1,30 @@
+.form-main{
+    padding: 10px;
+}
+
+.form-main__title{
+    text-align: center;
+    font-family: "Bebas Neue", serif;
+    font-size: 30px;
+    /* animation: bounce;
+    animation-duration: 1s; */
+}
+
+.form-main__card{
+    margin: 20px 100px;
+    border: 1px solid rgba(69, 69, 69, 0.45);
+    min-height: 570px;
+    border-radius: 20px;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2);
+}
+
+.steps{
+    padding: 40px;
+}
+
+.spin{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+}
