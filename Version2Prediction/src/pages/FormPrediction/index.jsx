@@ -28,7 +28,7 @@ function FormPrediction() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const predictResult = async (state) => {
-    const response = await fetch('http://127.0.0.1:8032/api-predict', {
+    const response = await fetch('http://127.0.0.1:8032/api-predict-v2', {
       method: 'POST',
       headers: {
         Accept: 'application/json',
