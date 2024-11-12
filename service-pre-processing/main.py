@@ -29,6 +29,8 @@ def pre_processing_v2():
         scaler = MinMaxScaler()
         continuous_columns = ['age', 'trestbps', 'chol', 'thalach', 'oldpeak']
         res_df = pd.DataFrame(res)
+        if 'target' in res_df.columns:
+            res_df = res_df.drop(columns=['target'])
         processed_data = res_df.to_dict(orient='records')
         collection.delete_many({})
         collection.insert_many(processed_data)
@@ -44,6 +46,7 @@ def pre_processing_v2():
 def pre_processing_maxmin():
     try:
         data = request.get_json()
+        res = do_pre_processing(data)
         all_data = list(collection.find())
         df = pd.DataFrame(all_data)
         if '_id' in df.columns:
@@ -58,7 +61,9 @@ def pre_processing_maxmin():
         scaler = MinMaxScaler()
         scaler.fit(df[continuous_columns])
 
-        input_df = pd.DataFrame(data) 
+        input_df = pd.DataFrame(res) 
+        if 'target' in input_df.columns:
+            input_df = input_df.drop(columns=['target'])
 
         if not all(col in input_df.columns for col in continuous_columns):
             return jsonify({"message": "Bản ghi đầu vào thiếu các cột cần thiết."}), 400
@@ -125,6 +130,9 @@ def do_pre_processing(data):
     #Thal (Thallium Stress Test Result)
     df = df[(df['thal'] >= 1) & (df['thal'] <= 3)]
 
+    if 'target' in df.columns:
+        df = df.drop(columns=['target'])
+        
     df = df.drop_duplicates()
     df = df[sorted(df.columns)]
     print("Số lượng dữ liệu sau khi xử lý:", len(df))
