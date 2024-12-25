@@ -1,6 +1,8 @@
 
 
-  
+  body{
+    background-image: url(../assets/nen.png);
+  }
   .header {
     height: 10%;
     background: #0b0121;
